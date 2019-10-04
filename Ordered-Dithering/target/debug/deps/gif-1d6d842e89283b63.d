@@ -1,0 +1,12 @@
+/media/chris/Data/Github/MultimediaSignalProcessingClass/Ordered-Dithering/target/debug/deps/gif-1d6d842e89283b63.rmeta: /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/lib.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/traits.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/common.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/mod.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/decoder.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/encoder.rs
+
+/media/chris/Data/Github/MultimediaSignalProcessingClass/Ordered-Dithering/target/debug/deps/libgif-1d6d842e89283b63.rlib: /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/lib.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/traits.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/common.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/mod.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/decoder.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/encoder.rs
+
+/media/chris/Data/Github/MultimediaSignalProcessingClass/Ordered-Dithering/target/debug/deps/gif-1d6d842e89283b63.d: /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/lib.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/traits.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/common.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/mod.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/decoder.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/encoder.rs
+
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/lib.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/traits.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/common.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/mod.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/reader/decoder.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/gif-0.10.3/src/encoder.rs:
