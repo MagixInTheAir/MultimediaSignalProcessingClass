@@ -1,5 +1,7 @@
 use structopt::StructOpt;
 use image::GenericImageView;
+use num_traits::pow::Pow;
+use rayon::prelude::*;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
@@ -42,45 +44,44 @@ fn mse(img1 : &image::DynamicImage, img2 : &image::DynamicImage) -> Result<f32, 
         return Err("Size doesn't match".to_string());
     }
 
-    let mut sum : i32 = 0;
+    let mut sum : f32 = 0.0;
     for pixels in pix1.iter().zip(pix2.iter()) {
         let (p1, p2) = pixels;
-        sum += ((*p1 as i32) - (*p2 as i32)).pow(2);
+        let pix1 = (*p1 as f32) / 255.0;
+        let pix2 = (*p2 as f32) / 255.0;
+        sum += (pix1 - pix2).pow(2);
     }
 
-    return Ok((sum as f32) / (pix1.len() as f32));
+    return Ok(sum / (pix1.len() as f32));
 }
 
 fn apply_dithering(image: image::DynamicImage, dither_array : [f32; 64]) -> image::DynamicImage {
 
-    let pixels = image.raw_pixels();
+    let mut pixels = image.raw_pixels();
     let size = image.dimensions();
     let img_width = size.0;
     let img_height = size.1;
     let dither_width = 8;
     let dither_height = 8;
 
-    let mut result : Vec<u8> = vec![];
+    let result = pixels.par_iter_mut().enumerate().map(|(index, pixel)| {
+            let img_x = (index as u32) % img_width;
+            let img_y = ((index as u32) - img_x) / img_height;
 
-    for (index, pixel) in pixels.into_iter().enumerate() {
-        let img_x = (index as u32) % img_width;
-        let img_y = ((index as u32) - img_x) / img_height;
+            let dither_x = img_x % dither_width;
+            let dither_y = img_y % dither_height;
+            let dither_index = dither_x + (dither_y * dither_width);
+            let dither_val = dither_array[dither_index as usize];
 
-        let dither_x = img_x % dither_width;
-        let dither_y = img_y % dither_height;
-        let dither_index = dither_x + (dither_y * dither_width);
-        let dither_val = dither_array[dither_index as usize];
+            let downscaled_pix : f32 = (*pixel as f32)  / 255.0;
+            let result_pixel = match downscaled_pix {
+                downscaled_pix if downscaled_pix < dither_val => 0,
+                downscaled_pix if downscaled_pix > dither_val => 255,
+                _ => 255                // ARBITRARY CHOICE !
+            };
 
-        let downscaled_pix : f32 = (pixel as f32)  / 255.0;
-        let result_pixel = match downscaled_pix {
-            downscaled_pix if downscaled_pix < dither_val => 0,
-            downscaled_pix if downscaled_pix > dither_val => 255,
-            _ => 255                // ARBITRARY CHOICE !
-        };
-
-        result.push(result_pixel);
-
-    }
+            return result_pixel;
+        }).collect();
 
     let buffer = image::ImageBuffer::from_vec(img_width, img_height, result).unwrap();
     return image::DynamicImage::ImageLuma8(buffer);
@@ -103,8 +104,6 @@ fn main() {
         img = img.grayscale();
     }
 
-    println!("{:?}", mse(&img, &img));
-
     if let image::DynamicImage::ImageLuma8(_) = img {
         println!("Image type ok");
     } else {
@@ -113,6 +112,9 @@ fn main() {
 
     let classical = apply_dithering(img.clone(), CLASSICAL_4);
     let bayer = apply_dithering(img.clone(), BAYER_5);
+
+    println!("Classical MSE : {}", mse(&img, &classical).unwrap());
+    println!("Bayer MSE : {}", mse(&img, &bayer).unwrap());
 
 
 
