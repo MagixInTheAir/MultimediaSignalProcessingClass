@@ -94,9 +94,6 @@ fn main() {
     println!("Reading image");
     let mut img = image::open(opt.file).unwrap();
 
-    println!("Saving input image");
-    img.save("./input.png").unwrap();
-
     if let image::ColorType::Gray(_) = img.color() {
         println!("Color type ok");
     } else {
@@ -109,6 +106,9 @@ fn main() {
     } else {
         println!("Wrong image type");
     }
+
+    println!("Saving input image");
+    img.save("./input.png").unwrap();
 
     let classical = apply_dithering(img.clone(), CLASSICAL_4);
     let bayer = apply_dithering(img.clone(), BAYER_5);
