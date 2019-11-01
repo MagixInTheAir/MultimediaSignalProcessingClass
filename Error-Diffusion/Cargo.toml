@@ -10,3 +10,6 @@ edition = "2018"
 image = "0.22.3"
 structopt = "0.3.2"
 num-traits = "0.2.8"
+
+[dependencies.img-quality]
+path = "../img-quality"

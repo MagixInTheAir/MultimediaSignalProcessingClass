@@ -1,6 +1,6 @@
 use structopt::StructOpt;
 use image::GenericImageView;
-use num_traits::pow::Pow;
+use img_quality;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
@@ -14,31 +14,6 @@ static floydSteinberg : [f32; 4] = [7.0/16.0, 3.0/16.0, 5.0/16.0, 1.0/16.0];
 static jarvisAndAl : [f32; 12] = [7.0/48.0, 5.0/48.0, 3.0/48.0, 5.0/48.0, 7.0/48.0, 5.0/48.0, 3.0/48.0, 1.0/48.0, 3.0/48.0, 5.0/48.0, 3.0/48.0, 1.0/48.0];
 static stucki : [f32; 12] = [8.0/42.0, 4.0/42.0, 2.0/42.0, 4.0/42.0, 8.0/42.0, 4.0/42.0, 2.0/42.0, 1.0/42.0, 2.0/42.0, 4.0/42.0, 2.0/42.0, 1.0/42.0];
 
-
-
-
-fn hpsnr(img1 : &image::DynamicImage, img2 : &image::DynamicImage) -> f32 {
-    return 0.0;
-}
-
-fn mse(img1 : &image::DynamicImage, img2 : &image::DynamicImage) -> Result<f32, String> {
-    let pix1 = img1.raw_pixels();
-    let pix2 = img2.raw_pixels();
-
-    if pix1.len() != pix2.len() {
-        return Err("Size doesn't match".to_string());
-    }
-
-    let mut sum : f32 = 0.0;
-    for pixels in pix1.iter().zip(pix2.iter()) {
-        let (p1, p2) = pixels;
-        let pix1 = (*p1 as f32) / 255.0;
-        let pix2 = (*p2 as f32) / 255.0;
-        sum += (pix1 - pix2).pow(2);
-    }
-
-    return Ok(sum / (pix1.len() as f32));
-}
 
 fn apply_errordiffusion(image: image::DynamicImage, err_ker: &[f32], err_ker_width: usize) -> image::DynamicImage {
 
@@ -121,9 +96,13 @@ fn main() {
     let output_ja = apply_errordiffusion(img.clone(), &jarvisAndAl[..], 5);
     let output_st = apply_errordiffusion(img.clone(), &stucki[..], 5);
 
-    println!("MSE FS : {}", mse(&img, &output_fs).unwrap());
-    println!("MSE JA : {}", mse(&img, &output_ja).unwrap());
-    println!("MSE ST : {}", mse(&img, &output_st).unwrap());
+    println!("MSE JA : {}", img_quality::mse(&img, &output_ja).unwrap());
+    println!("MSE ST : {}", img_quality::mse(&img, &output_st).unwrap());
+    println!("MSE FS : {}", img_quality::mse(&img, &output_fs).unwrap());
+
+    println!("HPSNR FS : {}", img_quality::hpsnr(&img, &output_fs).unwrap());
+    println!("HPSNR JA : {}", img_quality::hpsnr(&img, &output_ja).unwrap());
+    println!("HPSNR ST : {}", img_quality::hpsnr(&img, &output_st).unwrap());
 
 
 

@@ -5,6 +5,7 @@ name = "Ordered-Dithering"
 version = "0.1.0"
 dependencies = [
  "image 0.22.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "img-quality 0.1.0",
  "num-traits 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -171,6 +172,13 @@ dependencies = [
  "png 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "scoped_threadpool 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "tiff 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "img-quality"
+version = "0.1.0"
+dependencies = [
+ "image 0.22.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
