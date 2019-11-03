@@ -1,0 +1,46 @@
+   Compiling Ordered-Dithering v0.1.0 (/media/chris/Data/Github/MultimediaSignalProcessingClass/Ordered-Dithering)
+error[E0425]: cannot find value `index` in this scope
+  --> src/main.rs:46:26
+   |
+46 |             let img_x  = index % img_width;
+   |                          ^^^^^ not found in this scope
+
+error[E0425]: cannot find value `index` in this scope
+  --> src/main.rs:47:27
+   |
+47 |             let img_y = ((index as f64 - img_x as f64) / img_height as f64).floor();
+   |                           ^^^^^ not found in this scope
+
+error[E0425]: cannot find value `index` in this scope
+  --> src/main.rs:53:61
+   |
+53 |             println!("{:?}, {:?}, {:?}, {:?}, {:?}, {:?},", index, img_y, img_x, dither_y, dither_x, dither_index);
+   |                                                             ^^^^^ not found in this scope
+
+error[E0599]: no method named `floor` found for type `u32` in the current scope
+  --> src/main.rs:62:57
+   |
+62 |     let buffer = image::ImageBuffer::from_vec(img_width.floor() as u32, img_height.floor() as u32, result).unwrap();
+   |                                                         ^^^^^
+
+error[E0599]: no method named `floor` found for type `u32` in the current scope
+  --> src/main.rs:62:84
+   |
+62 |     let buffer = image::ImageBuffer::from_vec(img_width.floor() as u32, img_height.floor() as u32, result).unwrap();
+   |                                                                                    ^^^^^
+
+warning: unused import: `rayon::prelude`
+ --> src/main.rs:3:5
+  |
+3 | use rayon::prelude::*;
+  |     ^^^^^^^^^^^^^^
+  |
+  = note: #[warn(unused_imports)] on by default
+
+error: aborting due to 5 previous errors
+
+Some errors have detailed explanations: E0425, E0599.
+For more information about an error, try `rustc --explain E0425`.
+error: Could not compile `Ordered-Dithering`.
+
+To learn more, run the command again with --verbose.

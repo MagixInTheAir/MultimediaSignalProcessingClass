@@ -36,31 +36,30 @@ fn apply_dithering(image: image::DynamicImage, dither_array : [f32; 64]) -> imag
 
     let mut pixels = image.raw_pixels();
     let size = image.dimensions();
-    let img_width = size.0;
-    let img_height = size.1;
+    let img_width = size.0 as usize;
+    let img_height = size.1 as usize;
     let dither_width = 8;
     let dither_height = 8;
 
-    let result = pixels.par_iter_mut().enumerate().map(|(index, pixel)| {
-            let img_x = (index as u32) % img_width;
-            let img_y = ((index as u32) - img_x) / img_height;
+    // println!("{:?}", pixels);
+    let result = pixels.into_par_iter().enumerate().map(|(index, pixel)| {
+            let img_x : usize  = index % img_width;
+            let img_y : usize = ((index as f64 - img_x as f64) / img_width as f64).floor() as usize;
 
             let dither_x = img_x % dither_width;
             let dither_y = img_y % dither_height;
+
             let dither_index = dither_x + (dither_y * dither_width);
-            let dither_val = dither_array[dither_index as usize];
+            //println!("{:?}, {:?}, {:?}, {:?}, {:?}, {:?},", index, img_y, img_x, dither_y, dither_x, dither_index);
+            let dither_val = dither_array[dither_index];
+            
 
-            let downscaled_pix : f32 = (*pixel as f32)  / 255.0;
-            let result_pixel = match downscaled_pix {
-                downscaled_pix if downscaled_pix < dither_val => 0,
-                downscaled_pix if downscaled_pix > dither_val => 255,
-                _ => 255                // ARBITRARY CHOICE !
-            };
-
-            return result_pixel;
+            if (pixel as f32)  / 255.0 < dither_val { 
+                return 0; 
+            } else { return 255; }
         }).collect();
 
-    let buffer = image::ImageBuffer::from_vec(img_width, img_height, result).unwrap();
+    let buffer = image::ImageBuffer::from_vec(img_width as u32, img_height as u32, result).unwrap();
     return image::DynamicImage::ImageLuma8(buffer);
 }
 

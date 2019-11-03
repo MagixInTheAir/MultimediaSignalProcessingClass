@@ -1,13 +1,13 @@
 use image::GenericImageView;
 
 // Get value from flat 2D array, or 0 if out of bounds
-fn getVal<T>(arr: &Vec<T>, width: usize, x: usize, y: usize) -> T where T : Default + Copy {
+fn get_val<T>(arr: &Vec<T>, width: usize, x: usize, y: usize) -> T where T : Default + Copy {
     if x + (y*width) >= arr.len() { return T::default(); }
     return arr[x + (y*width)];
 }
 
 // Human vision filter
-pub fn getHVF() -> (Vec<f64>, usize) {
+pub fn get_hvf() -> (Vec<f64>, usize) {
     let std_dev : f64 = 1.3;   // Human vision model
     let hvf_size : usize = 9;    // Arbitrary
     let length = hvf_size*hvf_size;
@@ -15,19 +15,22 @@ pub fn getHVF() -> (Vec<f64>, usize) {
     for i in 0..length {
         // Position in the array
         let x : usize = i % hvf_size;
-        let y : usize = (i-x) % hvf_size;
+        let y : usize = (i-x) / hvf_size;
+        // println!("pos : ({:?}, {:?})", x, y);
 
         // Position in the array centered around zero
         let x_off : i32 = x as i32 - ((hvf_size as f64/2.0) + 1.0).floor() as i32;
         let y_off : i32 = y as i32 -((hvf_size as f64/2.0) + 1.0).floor() as i32;
+        // println!("pos_off : ({:?}, {:?})", x_off, y_off);
 
         // Gauss function
-        let distance_sq : usize = x_off.pow(2) as usize + y.pow(2) as usize;
-        let expPart : f64 = -(distance_sq as f64)/(2.0*std_dev*std_dev);
-        let factPart : f64 = 1.0/(2.0*std_dev);
+        let distance_sq : usize = x_off.pow(2) as usize + y_off.pow(2) as usize;
+        let exp_part : f64 = -(distance_sq as f64)/(2.0*std_dev*std_dev);
+        let fact_part : f64 = 1.0/(2.0*std_dev);
+        // println!("vals : {:?}, {:?}, {:?}, {:?} ", distance_sq, exp_part, fact_part, fact_part*exp_part.exp());
 
         // Save
-        filter.push(factPart * expPart.exp());
+        filter.push(fact_part * exp_part.exp());
     }
 
     return (filter, hvf_size);
@@ -35,7 +38,7 @@ pub fn getHVF() -> (Vec<f64>, usize) {
 
 // Compute human-filtered peak-to-peak signal-to-noise ratio
 pub fn hpsnr(original_img : &image::DynamicImage, new_img : &image::DynamicImage) -> Result<f64, String> {
-    let (filter, hvf_size) = getHVF();
+    let (filter, hvf_size) = get_hvf();
     
     // Dimensions check
     if original_img.dimensions() != new_img.dimensions() { return Err("Size doesn't match".to_string()); }
@@ -44,7 +47,7 @@ pub fn hpsnr(original_img : &image::DynamicImage, new_img : &image::DynamicImage
     let original = original_img.raw_pixels();
     let new = new_img.raw_pixels();
     
-        // Double loop for the denominator
+    // Double loop for the denominator
     let mut doublesum = 0.0;
     for i in 0..img_width {
         for j in 0..img_height {
@@ -52,7 +55,7 @@ pub fn hpsnr(original_img : &image::DynamicImage, new_img : &image::DynamicImage
             let mut sum : f64 = 0.0;
             for m in 0..hvf_size {
                 for n in 0..hvf_size {
-                    sum += getVal(&filter, hvf_size, m, n) * (getVal(&original, img_width, i+m, j+n) as f64 - getVal(&new, img_width, i+m, j+n) as f64);
+                    sum += get_val(&filter, hvf_size, m, n) * (get_val(&original, img_width, i+m, j+n) as f64 - get_val(&new, img_width, i+m, j+n) as f64);
                 }
             }
             doublesum += sum.powf(2.0);
