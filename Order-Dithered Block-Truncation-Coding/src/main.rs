@@ -15,27 +15,27 @@ struct Opt {
     file: String
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct VecBlock {
     width : usize, height : usize,
     pixels : Vec<u8>
 }
 
 #[derive(Debug, Clone)]
-struct EdbtcBlock {
+struct OdbtcBlock {
     high_color: u8, low_color: u8,
     pixels: Vec<u8>,
     width: usize, height : usize
 }
 
-impl fmt::Display for EdbtcBlock { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    return write!(f, "EdbtcBlock with a = {}, b = {} has pixels {:?}", self.high_color, self.low_color, self.pixels);
+impl fmt::Display for OdbtcBlock { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    return write!(f, "OdbtcBlock with a = {}, b = {} has pixels {:?}", self.high_color, self.low_color, self.pixels);
 }}
 
-struct EdbtcImage {
+struct OdbtcImage {
     block_count_x: usize,
     width : usize, height : usize,
-    blocks: Vec<EdbtcBlock>
+    blocks: Vec<OdbtcBlock>
 }
 
 fn get_block_nb(i : usize, img_width : usize, block_width : usize, block_height : usize, block_count_x : usize) -> (usize, usize, usize){
@@ -100,14 +100,13 @@ fn build_blocks(pixels : &Vec<u8>, img_width: usize, img_height: usize, block_si
         block.pixels.push(pixels[i]);
     }
 
-    // println!("{:?}, {:?}", blocks[0].len(), blocks[0]);
-    // println!("{:?}", pixels.len());
+    // println!("Generated {:?} VecBlocks", blocks.len());
 
     return (blocks, block_count_x, block_count_y);
 }
 
-fn encode_blocks(blocks : &Vec<VecBlock>, block_size: usize, block_count_x: usize, img_width: usize, img_height: usize) -> EdbtcImage {
-    let mut result : EdbtcImage = EdbtcImage{block_count_x: block_count_x, blocks: vec![], width: img_width, height: img_height};
+fn encode_blocks(blocks : &Vec<VecBlock>, block_size: usize, block_count_x: usize, img_width: usize, img_height: usize) -> OdbtcImage {
+    let mut result : OdbtcImage = OdbtcImage{block_count_x: block_count_x, blocks: vec![], width: img_width, height: img_height};
     for i in 0..blocks.len() {
         let block = &blocks[i];
 
@@ -125,29 +124,32 @@ fn encode_blocks(blocks : &Vec<VecBlock>, block_size: usize, block_count_x: usiz
         }
 
        
-        let newblock = EdbtcBlock{pixels: pix, low_color: min, high_color: max, width: block.width, height : block.height};
-        println!("newblock : {}", newblock);
+        let newblock = OdbtcBlock{pixels: pix, low_color: min, high_color: max, width: block.width, height : block.height};
+        // println!("newblock : {}", newblock);
         result.blocks.push(newblock);
         
     }
 
+    // println!("Generated {:?} blocks", result.blocks.len());
+
     return result;
 }
 
-fn edbtc_encode(image: image::DynamicImage, block_size : usize) -> EdbtcImage {
+fn odbtc_encode(image: image::DynamicImage, block_size : usize) -> OdbtcImage {
     println!("Encoding...");
 
     let pixels : Vec<u8> = image.raw_pixels();
     let size = image.dimensions();
     let width = size.0 as usize;
     let height = size.1 as usize;
+    println!("{:?} {:?}", width, height);
 
-    let (blocks, block_count_x, block_count_y) = build_blocks(&pixels, width, height, block_size);
-    return encode_blocks(&blocks, block_size, block_count_x, block_count_y, width);
+    let (blocks, block_count_x, _) = build_blocks(&pixels, width, height, block_size);
+    return encode_blocks(&blocks, block_size, block_count_x, width, height);
     
 }
 
-fn edbtc_decode(image: EdbtcImage) -> image::DynamicImage {
+fn odbtc_decode(image: OdbtcImage) -> image::DynamicImage {
     println!("Decoding...");
 
     let mut pixels : Vec<u8> = vec![];   
@@ -158,6 +160,7 @@ fn edbtc_decode(image: EdbtcImage) -> image::DynamicImage {
 
 
     // println!("{:?}, {:?}", basewidth, baseheight);
+    // println!("{:?} {:?} {:?}", image.width, image.height, fullsize);
     
     for i in 0..fullsize {    
 
@@ -200,23 +203,20 @@ fn main() {
     println!("Saving input image");
     img.save("./input.png").unwrap();
 
-    let output_4 = edbtc_decode(edbtc_encode(img.clone(), 4));
-    let output_8 = edbtc_decode(edbtc_encode(img.clone(), 8));
-    //let output_16 = edbtc_decode(edbtc_encode(img.clone(), 16));
-    //let output_32 = edbtc_decode(edbtc_encode(img.clone(), 32));
+    let output_4 = odbtc_decode(odbtc_encode(img.clone(), 4));
+    let output_8 = odbtc_decode(odbtc_encode(img.clone(), 8));
+    let output_16 = odbtc_decode(odbtc_encode(img.clone(), 16));
+    let output_32 = odbtc_decode(odbtc_encode(img.clone(), 32));
+
+    println!("Saving results");
+    output_8.save("./output8.png").unwrap();
+    output_4.save("./output4.png").unwrap();
+    output_16.save("./output16.png").unwrap();
+    output_32.save("./output32.png").unwrap();
 
     println!("HPSNR 4x4 : {}", img_quality::hpsnr(&img, &output_4).unwrap());
     println!("HPSNR 8x8 : {}", img_quality::hpsnr(&img, &output_8).unwrap());
-    //println!("HPSNR 16x16 : {}", img_quality::hpsnr(&img, &output_16).unwrap());
-    //println!("HPSNR 32x32 : {}", img_quality::hpsnr(&img, &output_32).unwrap());
-
-
-
-    println!("Saving results");
-    output_4.save("./output4.png").unwrap();
-    output_8.save("./output8.png").unwrap();
-    //output_16.save("./output16.png").unwrap();
-    //output_32.save("./output32.png").unwrap();
-
+    println!("HPSNR 16x16 : {}", img_quality::hpsnr(&img, &output_16).unwrap());
+    println!("HPSNR 32x32 : {}", img_quality::hpsnr(&img, &output_32).unwrap());
     
 }

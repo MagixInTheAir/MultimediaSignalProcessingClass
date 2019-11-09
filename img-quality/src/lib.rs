@@ -41,7 +41,7 @@ pub fn hpsnr(original_img : &image::DynamicImage, new_img : &image::DynamicImage
     let (filter, hvf_size) = get_hvf();
     
     // Dimensions check
-    if original_img.dimensions() != new_img.dimensions() { return Err("Size doesn't match".to_string()); }
+    if original_img.dimensions() != new_img.dimensions() { return Err(format!("Size doesn't match : {:?} vs {:?}", original_img.dimensions(), new_img.dimensions())); }
     let img_width = original_img.dimensions().0 as usize;
     let img_height = original_img.dimensions().1 as usize;
     let original = original_img.raw_pixels();
