@@ -1,5 +1,5 @@
 [package]
-name = "Error-Diffusion"
+name = "error_diffusion"
 version = "0.1.0"
 authors = ["kmgx <kmgx@declaverie.tech>"]
 edition = "2018"

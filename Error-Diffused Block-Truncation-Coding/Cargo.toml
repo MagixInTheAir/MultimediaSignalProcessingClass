@@ -1,5 +1,5 @@
 [package]
-name = "block_truncation_coding"
+name = "edbtc"
 version = "0.1.0"
 authors = ["kmgx <kmgx@declaverie.tech>"]
 edition = "2018"

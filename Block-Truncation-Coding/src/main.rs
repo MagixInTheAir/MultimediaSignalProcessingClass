@@ -1,7 +1,6 @@
 use structopt::StructOpt;
 use image::GenericImageView;
 use num_traits::pow::Pow;
-use bitvec::prelude::*;
 use std::string::String;
 use img_quality;
 use std::fmt;
@@ -21,17 +20,17 @@ struct VecBlock {
 
 #[derive(Debug, Clone)]
 struct BtcBlock {
-    highColor: u8, lowColor: u8,
+    high_color: u8, low_color: u8,
     width : usize, height : usize,
     pixels: Vec<u8>
 }
 
 impl fmt::Display for BtcBlock { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    return write!(f, "VecBlock ({}, {}) with a = {}, b = {} has pixels {:?}", self.width, self.height, self.highColor, self.lowColor, self.pixels);
+    return write!(f, "VecBlock ({}, {}) with a = {}, b = {} has pixels {:?}", self.width, self.height, self.high_color, self.low_color, self.pixels);
 }}
 
 struct BtcImage {
-    blockCountX: usize, blockCountY : usize,
+    block_count_x: usize,
     width : usize, height : usize,
     blocks: Vec<BtcBlock>
 }
@@ -40,7 +39,7 @@ fn no_overflow_cast(x : f64) -> u8 {
     if x < 0.0 { 0 } else if x > 255.0 { 255 } else { x as u8 }
 }
 
-fn get_block_nb(i : usize, img_width : usize, img_height : usize, block_width : usize, block_height : usize, block_count_x : usize) -> (usize, usize, usize){
+fn get_block_nb(i : usize, img_width : usize, block_width : usize, block_height : usize, block_count_x : usize) -> (usize, usize, usize){
     let pos_x = (i % img_width) as usize;
     let pos_y = ((i - pos_x) / img_width) as usize;
 
@@ -55,21 +54,21 @@ fn get_block_nb(i : usize, img_width : usize, img_height : usize, block_width : 
     return (block_count, block_pos_x, block_pos_y);
 }
 
-fn btc_encode(image: image::DynamicImage, blockWidth: usize, blockHeight: usize) -> BtcImage {
+fn btc_encode(image: image::DynamicImage, block_width: usize, block_height: usize) -> BtcImage {
     let pixels : Vec<u8> = image.raw_pixels();
     let size = image.dimensions();
     let img_width = size.0 as usize;
     let img_height = size.1 as usize;
 
     // Build the blocks
-    let block_count_x = (img_width as f64 / blockWidth as f64).ceil() as usize;
-    let block_count_y = (img_height as f64 / blockHeight as f64).ceil() as usize;
+    let block_count_x = (img_width as f64 / block_width as f64).ceil() as usize;
+    let block_count_y = (img_height as f64 / block_height as f64).ceil() as usize;
     let block_count_total = block_count_x * block_count_y;
     let mut blocks: Vec<VecBlock> = vec![VecBlock{height : 0, width : 0, pixels : vec![]}; block_count_total];
 
     for i in 0..pixels.len() {
         
-        let (block_pos, block_pos_x, block_pos_y) = get_block_nb(i, img_width, img_height, blockWidth, blockHeight, block_count_x);
+        let (block_pos, block_pos_x, block_pos_y) = get_block_nb(i, img_width, block_width, block_height, block_count_x);
         let block = &mut blocks[block_pos];
 
         if block_pos_x + 1 > block.width { block.width = block_pos_x + 1; }
@@ -80,7 +79,7 @@ fn btc_encode(image: image::DynamicImage, blockWidth: usize, blockHeight: usize)
     // println!("{:?}, {:?}", blocks[0].len(), blocks[0]);
     // println!("{:?}", pixels.len());
 
-    let mut result : BtcImage = BtcImage{ blockCountX: block_count_x, blockCountY : block_count_y, blocks: vec![], width: img_width, height: img_height};
+    let mut result : BtcImage = BtcImage{ block_count_x: block_count_x, blocks: vec![], width: img_width, height: img_height};
     for i in 0..blocks.len() {
         let block = &blocks[i];
 
@@ -96,7 +95,7 @@ fn btc_encode(image: image::DynamicImage, blockWidth: usize, blockHeight: usize)
 
         //let pix : BitVec = block.pixels.iter().map(|&x| if x < h as u8 { 0 } else { 1 }).collect::<Vec<u8>>().into();
         let pix : Vec<u8> = block.pixels.iter().map(|&x| if x < h as u8 { 0 } else { 1 }).collect::<Vec<u8>>().into();
-        let newblock = BtcBlock{pixels: pix, lowColor: no_overflow_cast(a), highColor: no_overflow_cast(b), width: block.width, height : block.height};
+        let newblock = BtcBlock{pixels: pix, low_color: no_overflow_cast(a), high_color: no_overflow_cast(b), width: block.width, height : block.height};
         //println!("newblock : {}", newblock);
         result.blocks.push(newblock);
         
@@ -115,12 +114,12 @@ fn btc_decode(image: BtcImage) -> image::DynamicImage {
 
     for i in 0..fullsize {    
 
-            let (block_pos, block_pos_x, block_pos_y) = get_block_nb(i, image.width, image.height, basewidth, baseheight, image.blockCountX);
+            let (block_pos, block_pos_x, block_pos_y) = get_block_nb(i, image.width, basewidth, baseheight, image.block_count_x);
             let block = &image.blocks[block_pos];
             let pixel_pos = (block_pos_y * block.width) + block_pos_x;
 
             let pixel = block.pixels[pixel_pos];
-            pixels.push(if pixel == 1 { block.highColor } else { block.lowColor });
+            pixels.push(if pixel == 1 { block.high_color } else { block.low_color });
 
 
     }

@@ -10,9 +10,9 @@ struct Opt {
 }
 
 
-static floydSteinberg : [f32; 4] = [7.0/16.0, 3.0/16.0, 5.0/16.0, 1.0/16.0];
-static jarvisAndAl : [f32; 12] = [7.0/48.0, 5.0/48.0, 3.0/48.0, 5.0/48.0, 7.0/48.0, 5.0/48.0, 3.0/48.0, 1.0/48.0, 3.0/48.0, 5.0/48.0, 3.0/48.0, 1.0/48.0];
-static stucki : [f32; 12] = [8.0/42.0, 4.0/42.0, 2.0/42.0, 4.0/42.0, 8.0/42.0, 4.0/42.0, 2.0/42.0, 1.0/42.0, 2.0/42.0, 4.0/42.0, 2.0/42.0, 1.0/42.0];
+static FLOYD_STEINBERG : [f32; 4] = [7.0/16.0, 3.0/16.0, 5.0/16.0, 1.0/16.0];
+static JARVIS_AND_AL : [f32; 12] = [7.0/48.0, 5.0/48.0, 3.0/48.0, 5.0/48.0, 7.0/48.0, 5.0/48.0, 3.0/48.0, 1.0/48.0, 3.0/48.0, 5.0/48.0, 3.0/48.0, 1.0/48.0];
+static STUCKI : [f32; 12] = [8.0/42.0, 4.0/42.0, 2.0/42.0, 4.0/42.0, 8.0/42.0, 4.0/42.0, 2.0/42.0, 1.0/42.0, 2.0/42.0, 4.0/42.0, 2.0/42.0, 1.0/42.0];
 
 
 fn apply_errordiffusion(image: image::DynamicImage, err_ker: &[f32], err_ker_width: usize) -> image::DynamicImage {
@@ -92,9 +92,9 @@ fn main() {
     println!("Saving input image");
     img.save("./input.png").unwrap();
 
-    let output_fs = apply_errordiffusion(img.clone(), &floydSteinberg[..], 3);
-    let output_ja = apply_errordiffusion(img.clone(), &jarvisAndAl[..], 5);
-    let output_st = apply_errordiffusion(img.clone(), &stucki[..], 5);
+    let output_fs = apply_errordiffusion(img.clone(), &FLOYD_STEINBERG[..], 3);
+    let output_ja = apply_errordiffusion(img.clone(), &JARVIS_AND_AL[..], 5);
+    let output_st = apply_errordiffusion(img.clone(), &STUCKI[..], 5);
 
     println!("MSE JA : {}", img_quality::mse(&img, &output_ja).unwrap());
     println!("MSE ST : {}", img_quality::mse(&img, &output_st).unwrap());
